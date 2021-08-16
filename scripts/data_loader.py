@@ -1,6 +1,5 @@
 import os
 import tensorflow as tf
-from conv_model import ConvModel, ConvModel_480x270
 import argparse
 import scipy
 import scipy.misc
