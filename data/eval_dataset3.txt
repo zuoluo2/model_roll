@@ -1,0 +1,4 @@
+/media/chaowang/film-chao/lane_output/model_roll_20210801T095124_j7-l4e-b0008_4_2580to2780
+/media/chaowang/film-chao/lane_output/model_roll_20210806T135414_j7-l4e-b0006_0_1999to2199
+/media/chaowang/film-chao/lane_output/model_roll_20210808T100200_j7-l4e-b0008_8_420to620_100m
+# /media/chaowang/film-chao/lane_output/model_roll_20210807T111417_j7-l4e-b0006_5_0to100

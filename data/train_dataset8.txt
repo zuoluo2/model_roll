@@ -1,0 +1,12 @@
+/media/chaowang/film-chao/lane_output/model_roll_20210801T095124_j7-l4e-b0008_5_0to2114_100m
+/media/chaowang/film-chao/lane_output/model_roll_20210731T092310_j7-l4e-b0007_0_1600to1700
+/media/chaowang/film-chao/lane_output/model_roll_20210728T082958_j7-l4e-b0006_1_1860to2160
+/media/chaowang/film-chao/lane_output/model_roll_20210808T100200_j7-l4e-b0008_6_0to600_100m
+/media/chaowang/film-chao/lane_output/model_roll_20210807T023618_j7-l4e-b0005_2_660to960_s9_down_100m
+/media/chaowang/film-chao/lane_output/model_roll_20210809T084638_j7-l4e-b0007_3_0to660_tunnel_100m
+/media/chaowang/film-chao/lane_output/model_roll_20210809T075843_j7-l4e-b0005_1_730to1200_g15_south_train_100m
+/media/chaowang/film-chao/lane_output/model_roll_20210808T054513_j7-l4e-b0005_0_1250to1830_g15_north_train_100m
+/media/chaowang/film-chao/lane_output/model_roll_20210808T054513_j7-l4e-b0005_0_1920to2520_s9_up_train_100m
+/media/chaowang/film-chao/lane_output/model_roll_20210718T101237_j7-l4e-b0006_1_0to900_chengdu_train_100m
+/media/chaowang/film-chao/lane_output/model_roll_20210718T101237_j7-l4e-b0006_1_1560to1980_chengdu_rain_train_100m
+# /media/chaowang/film-chao/lane_output/model_roll_20210804T061224_j7-l4e-b0005_2_0to1800_suzhou

@@ -30,3 +30,23 @@
 *.exe
 *.out
 *.app
+
+# Temp
+.\#*
+/TAGS
+/cscope.files
+/cscope.out
+*~
+debug/
+release/
+build
+vscode-build/
+cmake-build-*
+ui-build/
+.vscode/
+.idea/
+nbproject/
+core
+.pyc
+*.log
+.DS_Store

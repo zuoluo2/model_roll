@@ -1,0 +1,3 @@
+/media/chaowang/film-chao/lane_output/model_roll_20210801T095124_j7-l4e-b0008_5_0to2114_100m
+/media/chaowang/film-chao/lane_output/model_roll_20210731T092310_j7-l4e-b0007_0_1600to1700
+# /media/chaowang/film-chao/lane_output/model_roll_20210804T061224_j7-l4e-b0005_2_0to1800_suzhou
