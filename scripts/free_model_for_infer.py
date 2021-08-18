@@ -3,7 +3,7 @@ import argparse
 import tensorflow as tf
 from tensorflow.contrib import slim
 from tensorflow.python.framework import graph_util
-from conv_model import ConvModel, ConvModel_480x270, ConvModel_240x480, ConvModel_270x480
+from conv_model import ConvModel_270x480
 import uff
 import tensorrt as trt
 import os
