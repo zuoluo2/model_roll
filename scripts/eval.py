@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 import time
 import cv2
 from cv_bridge import CvBridge
+import shutil
 
 BATCH_SIZE = 100
 CHECKPOINT_EVERY = 100
@@ -56,6 +57,7 @@ def get_arguments():
                         default=L2_REG)
     parser.add_argument('--up_crop', type=int, default=UP_CROP)
     parser.add_argument('--alpha', type=int, default=0.9)
+    parser.add_argument('--large_rmse_thresh', type=float, default=1.0)
 
     return parser.parse_args()
 
@@ -98,7 +100,7 @@ def dump_feature_map(data_path, orig_image, fmap_name, fmap):
     fig.set_size_inches(24, 16)    
     plt.savefig(output_path)
 
-def visualize_model_output(data_path, orig_image_path, curr_roll, target_roll, pred_roll, smooth_pred_roll):
+def visualize_model_output(data_path, orig_image_path, curr_roll, target_roll, pred_roll, smooth_pred_roll, is_important):
     output_folder = data_path + '/model_vis'
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
@@ -111,7 +113,13 @@ def visualize_model_output(data_path, orig_image_path, curr_roll, target_roll, p
     cv2.putText(raw_image, 'smoothed model roll: %.2f' % float(smooth_pred_roll), (10, 122), cv2.FONT_HERSHEY_PLAIN, 2, (50,50,255), 2)
     cv2.imwrite(output_path, raw_image)
 
-
+    important_output_folder = data_path + '/model_important_vis'
+    if not os.path.exists(important_output_folder):
+        os.makedirs(important_output_folder)
+    if is_important:
+        important_output_path = important_output_folder + '/' + os.path.basename(orig_image_path)
+        cv2.imwrite(important_output_path, raw_image)
+    
 def main():
     args = get_arguments()
     data_loader = DataLoader(args.dataset_index, args.data_file, args.up_crop)
@@ -142,6 +150,8 @@ def main():
     y_vals = []
     smooth_rolls = []
     curr_rolls = []
+    large_rmse_count = 0
+    total_sample_count = 0
     for train_bag_samples in data_loader.train_bags:
         data_path = train_bag_samples[0]
         bag_ys_vals = []
@@ -150,6 +160,10 @@ def main():
         bag_curr_rolls = []
         smooth_roll = None
         bag_smooth_rolls = []
+        important_output_folder = data_path + '/model_important_vis'
+        if os.path.exists(important_output_folder):
+            shutil.rmtree(important_output_folder)
+        
         for i in range(len(train_bag_samples[1])):
             xs, ys, x_name, curr_roll = data_loader.load_eval_batch(train_bag_samples, i)
             # train_step.run(feed_dict={model.x: xs, model.y_: ys, model.keep_prob: args.keep_prob}, session=sess)
@@ -160,8 +174,10 @@ def main():
             bag_y_vals.append(y[0][0])
             y_vals.append(y[0][0])
             # h_fc4 = sess.run(model.h_fc4, feed_dict={model.x: xs, model.y_: ys, model.keep_prob: args.keep_prob})
-            bag_rmse_error += (y[0][0] - ys[0][0]) * (y[0][0] - ys[0][0])
-            rmse_error += (y[0][0] - ys[0][0]) * (y[0][0] - ys[0][0])
+            pred_roll = y[0][0]
+            target_roll = ys[0][0]
+            bag_rmse_error += (pred_roll - target_roll) * (pred_roll - target_roll)
+            rmse_error += (pred_roll - target_roll) * (pred_roll - target_roll)
             bag_curr_rolls.append(curr_roll[0])
             curr_rolls.append(curr_roll[0])
             
@@ -173,10 +189,13 @@ def main():
             bag_smooth_rolls.append(smooth_roll)
             smooth_rolls.append(smooth_roll)
             for k in range(len(y)):
-                output_file.write("%s\t%f\t%f\t%f\t%f\n" % (x_name[k], curr_roll[0], ys[k][0], y[k][0], smooth_roll))
-            if i % 100 == 0:
-                print "processed %d samples" % i
+                output_file.write("%s\t%f\t%f\t%f\t%f\n" % (x_name[k], curr_roll[0], target_roll, pred_roll, smooth_roll))
             # print W_fc5
+            if abs(pred_roll - target_roll) > args.large_rmse_thresh:
+                large_rmse_count += 1
+                is_large_rmse_sample = True
+            else:
+                is_large_rmse_sample = False
             if args.dump_feature_map:
                 dump_feature_map(data_path, x_name[0], 'h_conv1', h_conv1)
                 dump_feature_map(data_path, x_name[0], 'h_conv2', h_conv2)
@@ -186,13 +205,18 @@ def main():
                 # dump_feature_map(data_path, x_name[0], 'h_conv6', h_conv6)
                 print 'finish dump:', x_name[0]
             if args.dump_model_vis:
-                visualize_model_output(data_path, x_name[0], curr_roll[0], ys[0][0], y[0][0], smooth_roll)
+                visualize_model_output(data_path, x_name[0], curr_roll[0], target_roll, pred_roll, smooth_roll, is_large_rmse_sample)
+
+            total_sample_count += 1
+            if i % 100 == 0:
+                print "processed %d samples" % i                
         bag_rmse_error = math.sqrt(bag_rmse_error / len(bag_ys_vals))
         print "%s\t%f" % (data_path, bag_rmse_error)
         render(data_path, args.model_path, bag_curr_rolls, bag_ys_vals, bag_y_vals, bag_smooth_rolls, bag_rmse_error)
 
     rmse_error = math.sqrt(rmse_error / len(data_loader.train_xs))
     print "rmse: ", rmse_error
+    print "large rmse count: ", large_rmse_count, ", ratio: ", float(large_rmse_count) / float(total_sample_count)
     output_file.close()
     render(output_folder, args.model_path, curr_rolls, ys_vals, y_vals, smooth_rolls, rmse_error)
     plt.show()
