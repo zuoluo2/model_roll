@@ -163,13 +163,14 @@ def find_nearest_index_sorted_by_pose(start_idx, pose_samples, target_pose):
     return target_idx
 
 
-def assign_label(camera_samples, pose_samples, roll_angle_samples):
+def assign_label(camera_samples, pose_samples, roll_angle_samples, lane_path_roll_samples):
     results = []
     last_pose_idx = 0
     last_roll_idx = 0
     last_target_ts_roll_idx = 0
     last_target_pose_idx = 0
     last_target_pose_roll_idx = 0
+    last_lane_path_roll_idx = 0
     for camera_sample in camera_samples:
         sample = {'image_index': camera_sample[1], 'camera_path': camera_sample[2]}
         ts = camera_sample[0]
@@ -210,12 +211,18 @@ def assign_label(camera_samples, pose_samples, roll_angle_samples):
             sample['target_ts_roll_ts'] = roll_angle_samples[target_idx][0]
             sample['target_ts_roll_angle'] = roll_angle_samples[target_idx][1]
 
+        target_idx = find_nearest_index_sorted(last_lane_path_roll_idx, lane_path_roll_samples, ts)
+        last_lane_path_roll_idx = target_idx
+        if target_idx < len(lane_path_roll_samples):
+            sample['lane_path_ts_roll_ts'] = lane_path_roll_samples[target_idx][0]
+            sample['lane_path_ts_roll_angle'] = lane_path_roll_samples[target_idx][1]
+
         if 'target_ts_roll_angle' in sample and 'curr_roll_angle' in sample and 'target_pose_roll_angle' in sample:
             results.append([camera_sample[0], sample])
 
     with open(os.path.join(args.output_path, 'result.tsv'), 'w') as result_file:
         for sample in results:
-            result_file.write("%s\t%d\t%f\t%f\t%f\n" % (str(format(sample[0], '.2f')), sample[1]['image_index'], sample[1]['curr_roll_angle'], sample[1]['target_ts_roll_angle'], sample[1]['target_pose_roll_angle']))
+            result_file.write("%s\t%d\t%f\t%f\t%f\t%f\n" % (str(format(sample[0], '.2f')), sample[1]['image_index'], sample[1]['curr_roll_angle'], sample[1]['target_ts_roll_angle'], sample[1]['target_pose_roll_angle'], sample[1]['lane_path_ts_roll_angle']))
 
     return results
 
@@ -228,6 +235,7 @@ def visualize_samples(output_folder, samples):
         cv2.putText(raw_image, 'imu roll: %.2f' % sample['curr_roll_angle'], (10, 26), cv2.FONT_HERSHEY_PLAIN, 2, (0,0,255), 2)
         cv2.putText(raw_image, 'target ts roll: %.2f' % sample['target_ts_roll_angle'], (10, 50), cv2.FONT_HERSHEY_PLAIN, 2, (0,0,255), 2)
         cv2.putText(raw_image, 'target pose roll: %.2f' % sample['target_pose_roll_angle'], (10, 74), cv2.FONT_HERSHEY_PLAIN, 2, (0,0,255), 2)
+        cv2.putText(raw_image, 'lane path ts roll: %.2f' % sample['lane_path_ts_roll_angle'], (10, 96), cv2.FONT_HERSHEY_PLAIN, 2, (0,0,255), 2)
         output_path = os.path.join(output_folder + '/vis', ('%.2f' % ts) + '_' + str('%05d' % image_index) + '.jpg')
         cv2.imwrite(output_path, raw_image)
         if abs(float(sample['curr_roll_angle']) - float(sample['target_pose_roll_angle'])) > 0.5:
@@ -265,9 +273,10 @@ def main():
     image_width = None
     camera_samples = []
     roll_angle_samples = []
+    lane_path_roll_samples = []
     pose_samples = []
     image_index = 0
-    for topic, msg, t in bag.read_messages(topics=['/planning/trajectory', '/perception/lane_path', '/navsat/odom', '/front_left_camera/image_color/compressed', '/vehicle/control_cmd']):
+    for topic, msg, t in bag.read_messages(topics=['/planning/trajectory', '/perception/lane_path', '/navsat/odom', '/front_left_camera/image_color/compressed', '/vehicle/control_cmd', '/perception/lane_path']):
         if topic == '/navsat/odom':
             curr_sec = float(str(msg.header.stamp)) / 1000000000.0
             # print curr_sec
@@ -300,13 +309,19 @@ def main():
             control_cmd.ParseFromString(msg.data)
             # print control_cmd.header.timestamp_msec / 1000.0, control_cmd.debug_cmd.roll_angle
             roll_angle_samples.append([control_cmd.header.timestamp_msec / 1000.0, control_cmd.debug_cmd.roll_angle])
-            
+
+        elif topic == '/perception/lane_path':
+            lane_detection = LaneDetection()
+            lane_detection.ParseFromString(msg.data)
+            lane_path_roll_samples.append([lane_detection.header.timestamp_msec / 1000.0, lane_detection.road_semantics.road_roll_degree])
+
     print 'finish reading msg, start labeling'
     camera_samples.sort(key=lambda x: x[0])
     pose_samples.sort(key=lambda x: x[0])
     roll_angle_samples.sort(key=lambda x: x[0])
+    lane_path_roll_samples.sort(key=lambda x: x[0])
 
-    labeled_samples = assign_label(camera_samples, pose_samples, roll_angle_samples)
+    labeled_samples = assign_label(camera_samples, pose_samples, roll_angle_samples, lane_path_roll_samples)
     print 'start generate visualize images'
     visualize_samples(args.output_path, labeled_samples)
     

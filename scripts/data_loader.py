@@ -48,7 +48,7 @@ class DataLoader:
                     ts = fs[0]
                     index = fs[1]
                     image_name = ts + ('_%05d' % int(index))
-                    label = float(fs[-1])
+                    label = float(fs[4])
                     curr_roll = float(fs[2])
                     weight = 1.0
                     if for_train and abs(label - curr_roll) > 0.5:
