@@ -4,6 +4,25 @@ import argparse
 import scipy
 import scipy.misc
 import random
+from PIL import Image
+from PIL import ImageEnhance
+import numpy.random as npr
+
+# data augmentation
+ADJUST_BRIGHTNESS = False
+ADJUST_CONTRAST = True
+
+def adjust_brightness(img):
+    enhancer = ImageEnhance.Brightness(img)
+    factor = npr.uniform(0.5, 1.5)
+    return enhancer.enhance(factor)
+
+def adjust_contrast(img):
+    enhancer = ImageEnhance.Contrast(img)
+    factor = npr.uniform(1., 1.5)
+    if npr.random() < 0.5:
+        factor = 1./factor
+    return enhancer.enhance(factor)
 
 class DataLoader:
     def __init__(self, dataset_index_path, data_file, up_crop):
@@ -58,6 +77,26 @@ class DataLoader:
                         bag_ys.append(label)
                         bag_curr_roll.append(curr_roll)
                     last_train_frame = last_frame
+
+                    # do data augmentation to training set
+                    if for_train and ADJUST_BRIGHTNESS:
+                        if not os.path.exists(dataset_path + '/brightened'):
+                            os.makedirs(dataset_path + '/brightened')
+                        image = Image.open(os.path.join(dataset_path, 'raw', image_name + '.jpg'))
+                        brightened_img = adjust_brightness(image)
+                        brightened_img.save(dataset_path + '/brightened/' + image_name + '.jpg')
+                        bag_xs.append(os.path.join(dataset_path, 'brightened', image_name + '.jpg'))
+                        bag_ys.append(label)
+                        bag_curr_roll.append(curr_roll)
+                    if for_train and ADJUST_CONTRAST:
+                        if not os.path.exists(dataset_path + '/contrast'):
+                            os.makedirs(dataset_path + '/contrast')
+                        image = Image.open(os.path.join(dataset_path, 'raw', image_name + '.jpg'))
+                        contrast_img = adjust_contrast(image)
+                        contrast_img.save(dataset_path + '/contrast/' + image_name + '.jpg')
+                        bag_xs.append(os.path.join(dataset_path, 'contrast', image_name + '.jpg'))
+                        bag_ys.append(label)
+                        bag_curr_roll.append(curr_roll)
             self.train_bags.append([dataset_path, bag_xs, bag_ys, bag_curr_roll])
             xs += bag_xs
             ys += bag_ys
