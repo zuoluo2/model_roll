@@ -17,3 +17,6 @@
 /home/luo/Downloads/roll/model_training/lane_output/model_roll_20210816T095758_j7-l4e-b0008_9_0to935_100m
 /home/luo/Downloads/roll/model_training/lane_output/model_roll_20210816T095758_j7-l4e-b0008_9_1000to2148_100m
 /home/luo/Downloads/roll/model_training/lane_output/model_roll_20210816T095758_j7-l4e-b0008_9_2297to2421_100m
+# c2 Shandong multi-lane highway
+/home/luo/Downloads/roll/model_training/lane_output/model_roll_20211117T160933_j7-l4e-c0002_LFWSRXSJ4M1F44912_0_100to1880_day_100m
+/home/luo/Downloads/roll/model_training/lane_output/model_roll_20211121T150933_j7-l4e-c0002_LFWSRXSJ4M1F44912_4_100m

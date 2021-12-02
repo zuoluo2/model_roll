@@ -1,0 +1,14 @@
+/home/luo/Downloads/roll/model_training/lane_output/model_roll_20210801T095124_j7-l4e-b0008_4_2580to2780_100m
+/home/luo/Downloads/roll/model_training/lane_output/model_roll_20210806T135414_j7-l4e-b0006_0_1999to2199_100m
+/home/luo/Downloads/roll/model_training/lane_output/model_roll_20210808T100200_j7-l4e-b0008_8_420to620_100m
+/home/luo/Downloads/roll/model_training/lane_output/model_roll_20210726T155125_j7-l4e-b0007_0_2400to2500_100m
+/home/luo/Downloads/roll/model_training/lane_output/model_roll_20210816T121833_j7-l4e-b0007_2_2820to2880_100m
+/home/luo/Downloads/roll/model_training/lane_output/model_roll_20210809T075843_j7-l4e-b0005_1_0to300_s9_down_100m
+/home/luo/Downloads/roll/model_training/lane_output/model_roll_20210809T092941_j7-l4e-b0006_4_1745to1845_ldw_100m
+/home/luo/Downloads/roll/model_training/lane_output/model_roll_20210718T101420_j7-l4e-00003_1_0to200_chengdu_rain_eval_100m
+/home/luo/Downloads/roll/model_training/lane_output/model_roll_20210718T101237_j7-l4e-b0006_1_3000to3200_chengdu_rain_eval_100m
+/home/luo/Downloads/roll/model_training/lane_output/model_roll_20210814T053410_j7-l4e-b0005_3_300to600_s9_down_eval_100m
+/home/luo/Downloads/roll/model_training/lane_output/model_roll_20210812T070215_j7-l4e-b0005_0_1320to1620_s9_up_eval_100m
+# C2 Shandong highway
+/home/luo/Downloads/roll/model_training/lane_output/model_roll_20211125T170259_j7-l4e-c0002_LFWSRXSJ4M1F44912_1_220to420_shandong_night_100m
+/home/luo/Downloads/roll/model_training/lane_output/model_roll_20211129T143116_j7-l4e-c0002_LFWSRXSJ4M1F44912_4_0to200_shandong_day_100m
